@@ -521,6 +521,8 @@
         const giorno = giorni[oggi.getDay()];
         const data = oggi.toLocaleDateString('it-IT');
         
+        console.log('Data che verrà inviata:', data);
+        
         document.getElementById('giorno').textContent = giorno;
         document.getElementById('data').textContent = data;
         
