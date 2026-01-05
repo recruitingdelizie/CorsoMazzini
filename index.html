@@ -754,38 +754,60 @@
             ];
             
             try {
-                // Invia i dati alla webapp di Google Apps Script
+                // Invia i dati alla webapp di Google Apps Script usando iframe nascosto
                 const webappURL = 'https://script.google.com/macros/s/AKfycbwmirf8KGyxCYO8lF3y35IP2XFF3xc_EoDJRRdhMAYioILxspZxQ9_lVRqIsn-mw0Vm/exec';
                 
-                const response = await fetch(webappURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sede: 'Corso Mazzini',
-                        data: data,
-                        giorno: giorno,
-                        spesa1: spesa1Value,
-                        importoSpesa1: parseFloat(formData.get('importoSpesa1')) || 0,
-                        spesa2: spesa2Value,
-                        importoSpesa2: parseFloat(formData.get('importoSpesa2')) || 0,
-                        spesa3: spesa3Value,
-                        importoSpesa3: parseFloat(formData.get('importoSpesa3')) || 0,
-                        spesa4: spesa4Value,
-                        importoSpesa4: parseFloat(formData.get('importoSpesa4')) || 0,
-                        fornitore1: fornitore1Value,
-                        importoFornitore1: parseFloat(formData.get('importoFornitore1')) || 0,
-                        fornitore2: fornitore2Value,
-                        importoFornitore2: parseFloat(formData.get('importoFornitore2')) || 0,
-                        fornitore3: fornitore3Value,
-                        importoFornitore3: parseFloat(formData.get('importoFornitore3')) || 0,
-                        pos: parseFloat(formData.get('pos')) || 0,
-                        contanti: parseFloat(formData.get('contanti')) || 0,
-                        corrispettivi: parseFloat(formData.get('corrispettivi')) || 0
-                    })
-                });
+                // Crea iframe nascosto se non esiste
+                let iframe = document.getElementById('hiddenFrame');
+                if (!iframe) {
+                    iframe = document.createElement('iframe');
+                    iframe.id = 'hiddenFrame';
+                    iframe.name = 'hiddenFrame';
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                }
+                
+                // Crea form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = webappURL;
+                form.target = 'hiddenFrame';
+                
+                // Aggiungi i dati come campi nascosti
+                const dataToSend = {
+                    sede: 'Corso Mazzini',
+                    data: data,
+                    giorno: giorno,
+                    spesa1: spesa1Value,
+                    importoSpesa1: parseFloat(formData.get('importoSpesa1')) || 0,
+                    spesa2: spesa2Value,
+                    importoSpesa2: parseFloat(formData.get('importoSpesa2')) || 0,
+                    spesa3: spesa3Value,
+                    importoSpesa3: parseFloat(formData.get('importoSpesa3')) || 0,
+                    spesa4: spesa4Value,
+                    importoSpesa4: parseFloat(formData.get('importoSpesa4')) || 0,
+                    fornitore1: fornitore1Value,
+                    importoFornitore1: parseFloat(formData.get('importoFornitore1')) || 0,
+                    fornitore2: fornitore2Value,
+                    importoFornitore2: parseFloat(formData.get('importoFornitore2')) || 0,
+                    fornitore3: fornitore3Value,
+                    importoFornitore3: parseFloat(formData.get('importoFornitore3')) || 0,
+                    pos: parseFloat(formData.get('pos')) || 0,
+                    contanti: parseFloat(formData.get('contanti')) || 0,
+                    corrispettivi: parseFloat(formData.get('corrispettivi')) || 0
+                };
+                
+                // Crea campo nascosto con JSON
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'data';
+                input.value = JSON.stringify(dataToSend);
+                form.appendChild(input);
+                
+                // Aggiungi il form al body e invialo
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
                 
                 document.getElementById('successMessage').style.display = 'block';
                 setTimeout(() => {
@@ -797,7 +819,14 @@
                     spesa4Row.style.display = 'none';
                     fornitore2Row.style.display = 'none';
                     fornitore3Row.style.display = 'none';
-                }, 3000);
+                    spesa1Altro.style.display = 'none';
+                    spesa2Altro.style.display = 'none';
+                    spesa3Altro.style.display = 'none';
+                    spesa4Altro.style.display = 'none';
+                    fornitore1Altro.style.display = 'none';
+                    fornitore2Altro.style.display = 'none';
+                    fornitore3Altro.style.display = 'none';
+                }, 2000);
                 
             } catch (error) {
                 console.error('Errore:', error);
