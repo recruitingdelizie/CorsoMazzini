@@ -326,7 +326,7 @@
         
         <div class="date-info">
             <p><strong>Giorno:</strong> <span class="giorno-value" id="giorno"></span></p>
-            <p><strong>Data:</strong> <span class="data-value" id="data"></span></p>
+            <p><strong>Data:</strong> <input type="date" id="datePicker" style="font-size: 18px; font-weight: 600; color: #1e40af; border: 2px solid #bfdbfe; border-radius: 6px; padding: 8px; background: #eff6ff;"></p>
         </div>
         
         <form id="dataForm">
@@ -421,8 +421,8 @@
                 
                 <div class="form-row">
                     <div>
-                        <label>Fornitore 1 *</label>
-                        <select name="fornitore1" id="fornitore1" required>
+                        <label>Fornitore 1</label>
+                        <select name="fornitore1" id="fornitore1">
                             <option value="">-- Seleziona --</option>
                             <option value="San Carlo">San Carlo</option>
                             <option value="Dolciaria Lametina">Dolciaria Lametina</option>
@@ -433,8 +433,8 @@
                         <input type="text" name="fornitore1Altro" id="fornitore1Altro" placeholder="Specifica..." style="display: none; margin-top: 8px; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
                     </div>
                     <div>
-                        <label>Importo € *</label>
-                        <input type="number" step="0.01" name="importoFornitore1" id="importoFornitore1" placeholder="0.00" required>
+                        <label>Importo €</label>
+                        <input type="number" step="0.01" name="importoFornitore1" id="importoFornitore1" placeholder="0.00">
                     </div>
                 </div>
                 
@@ -518,13 +518,31 @@
         // Imposta data e giorno correnti
         const oggi = new Date();
         const giorni = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
-        const giorno = giorni[oggi.getDay()];
-        const data = oggi.toLocaleDateString('it-IT');
         
-        console.log('Data che verrà inviata:', data);
+        // Formatta la data per l'input date (YYYY-MM-DD)
+        const anno = oggi.getFullYear();
+        const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+        const giornoNum = String(oggi.getDate()).padStart(2, '0');
+        const dataInputFormat = `${anno}-${mese}-${giornoNum}`;
         
-        document.getElementById('giorno').textContent = giorno;
-        document.getElementById('data').textContent = data;
+        // Imposta il date picker
+        const datePicker = document.getElementById('datePicker');
+        datePicker.value = dataInputFormat;
+        
+        // Funzione per aggiornare il giorno della settimana
+        function aggiornaGiorno() {
+            const dataSelezionata = new Date(datePicker.value + 'T00:00:00');
+            const giorno = giorni[dataSelezionata.getDay()];
+            document.getElementById('giorno').textContent = giorno;
+        }
+        
+        // Aggiorna il giorno iniziale
+        aggiornaGiorno();
+        
+        // Aggiorna il giorno quando cambia la data
+        datePicker.addEventListener('change', aggiornaGiorno);
+        
+        console.log('Data iniziale:', datePicker.value);
         
         // Logica per mostrare campi progressivamente
         // SPESE
@@ -653,7 +671,8 @@
         });
         
         function checkFornitore1() {
-            if (fornitore1Select.value && fornitore1Input.value) {
+            // Mostra Fornitore 2 solo se ENTRAMBI i campi di Fornitore 1 sono compilati
+            if (fornitore1Select.value && fornitore1Input.value && parseFloat(fornitore1Input.value) > 0) {
                 fornitore2Row.style.display = 'grid';
             } else {
                 fornitore2Row.style.display = 'none';
@@ -662,7 +681,8 @@
         }
         
         function checkFornitore2() {
-            if (fornitore2Select.value && fornitore2Input.value) {
+            // Mostra Fornitore 3 solo se ENTRAMBI i campi di Fornitore 2 sono compilati
+            if (fornitore2Select.value && fornitore2Input.value && parseFloat(fornitore2Input.value) > 0) {
                 fornitore3Row.style.display = 'grid';
             } else {
                 fornitore3Row.style.display = 'none';
@@ -677,6 +697,16 @@
         // Gestione form
         document.getElementById('dataForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Ottieni la data selezionata e convertila in formato gg/mm/aaaa
+            const dataSelezionata = new Date(datePicker.value + 'T00:00:00');
+            const giornoFormattato = String(dataSelezionata.getDate()).padStart(2, '0');
+            const meseFormattato = String(dataSelezionata.getMonth() + 1).padStart(2, '0');
+            const annoFormattato = dataSelezionata.getFullYear();
+            const data = `${giornoFormattato}/${meseFormattato}/${annoFormattato}`;
+            const giorno = giorni[dataSelezionata.getDay()];
+            
+            console.log('Data da salvare:', data, 'Giorno:', giorno);
             
             // Validazione campo "Altro"
             if (spesa1Select.value === 'Altro' && !spesa1Altro.value.trim()) {
@@ -703,6 +733,7 @@
                 return;
             }
             
+            // Validazione Altro per fornitori (solo se il fornitore è stato selezionato)
             if (fornitore1Select.value === 'Altro' && !fornitore1Altro.value.trim()) {
                 alert('⚠️ Devi specificare il fornitore per "Altro"');
                 fornitore1Altro.focus();
@@ -841,3 +872,4 @@
     </script>
 </body>
 </html>
+
