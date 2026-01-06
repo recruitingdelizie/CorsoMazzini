@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corso Mazzini - Inserimento Dati</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +13,7 @@
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             min-height: 100vh;
             padding: 20px;
@@ -320,8 +321,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Corso Mazzini</h1>
-            <p style="color: #666;">Inserimento Dati Giornalieri</p>
+            <h1>Corso Mazzini</h1>
+            <p style="color: #666;">Report di oggi</p>
         </div>
         
         <div class="date-info">
@@ -332,12 +333,12 @@
         <form id="dataForm">
             <!-- SPESE -->
             <div class="section spese-section">
-                <div class="section-title">🛒 Spese</div>
+                <div class="section-title">Spese</div>
                 
                 <div class="form-row">
                     <div>
-                        <label>Spesa 1 *</label>
-                        <select name="spesa1" id="spesa1" required>
+                        <label>Spesa 1</label>
+                        <select name="spesa1" id="spesa1">
                             <option value="">-- Seleziona --</option>
                             <option value="Coop">Coop</option>
                             <option value="Proprietà">Proprietà</option>
@@ -349,8 +350,8 @@
                         <input type="text" name="spesa1Altro" id="spesa1Altro" placeholder="Specifica..." style="display: none; margin-top: 8px; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
                     </div>
                     <div>
-                        <label>Importo € *</label>
-                        <input type="number" step="0.01" name="importoSpesa1" id="importoSpesa1" placeholder="0.00" required>
+                        <label>Importo €</label>
+                        <input type="number" step="0.01" name="importoSpesa1" id="importoSpesa1" placeholder="0.00">
                     </div>
                 </div>
                 
@@ -417,7 +418,7 @@
             
             <!-- FORNITORI -->
             <div class="section fornitori-section">
-                <div class="section-title">🏭 Fornitori</div>
+                <div class="section-title">Fornitori</div>
                 
                 <div class="form-row">
                     <div>
@@ -435,6 +436,12 @@
                     <div>
                         <label>Importo €</label>
                         <input type="number" step="0.01" name="importoFornitore1" id="importoFornitore1" placeholder="0.00">
+                        <div style="margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+                                <input type="checkbox" name="bonifico1" id="bonifico1" style="width: auto; cursor: pointer;">
+                                <span>Seguirà pagamento tramite bonifico</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 
@@ -454,6 +461,12 @@
                     <div>
                         <label>Importo €</label>
                         <input type="number" step="0.01" name="importoFornitore2" id="importoFornitore2" placeholder="0.00">
+                        <div style="margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+                                <input type="checkbox" name="bonifico2" id="bonifico2" style="width: auto; cursor: pointer;">
+                                <span>Seguirà pagamento tramite bonifico</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 
@@ -473,13 +486,19 @@
                     <div>
                         <label>Importo €</label>
                         <input type="number" step="0.01" name="importoFornitore3" id="importoFornitore3" placeholder="0.00">
+                        <div style="margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+                                <input type="checkbox" name="bonifico3" id="bonifico3" style="width: auto; cursor: pointer;">
+                                <span>Seguirà pagamento tramite bonifico</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- INCASSI -->
             <div class="section incassi-section">
-                <div class="section-title">💰 Incassi</div>
+                <div class="section-title">Incassi</div>
                 
                 <div class="single-field">
                     <label>POS € *</label>
@@ -497,15 +516,15 @@
                 </div>
             </div>
             
-            <button type="submit">✅ Salva Dati</button>
+            <button type="submit">Salva Dati</button>
         </form>
         
         <div class="success-message" id="successMessage">
-            ✅ Dati salvati con successo!
+            Dati salvati con successo!
         </div>
         
         <div class="error-message" id="errorMessage">
-            ❌ Errore nel salvataggio. Riprova.
+            Errore nel salvataggio. Riprova.
         </div>
     </div>
     
@@ -598,7 +617,8 @@
         });
         
         function checkSpesa1() {
-            if (spesa1Select.value && spesa1Input.value) {
+            // Mostra Spesa 2 solo se ENTRAMBI i campi di Spesa 1 sono compilati
+            if (spesa1Select.value && spesa1Input.value && parseFloat(spesa1Input.value) > 0) {
                 spesa2Row.style.display = 'grid';
             } else {
                 spesa2Row.style.display = 'none';
@@ -608,7 +628,8 @@
         }
         
         function checkSpesa2() {
-            if (spesa2Select.value && spesa2Input.value) {
+            // Mostra Spesa 3 solo se ENTRAMBI i campi di Spesa 2 sono compilati
+            if (spesa2Select.value && spesa2Input.value && parseFloat(spesa2Input.value) > 0) {
                 spesa3Row.style.display = 'grid';
             } else {
                 spesa3Row.style.display = 'none';
@@ -617,7 +638,8 @@
         }
         
         function checkSpesa3() {
-            if (spesa3Select.value && spesa3Input.value) {
+            // Mostra Spesa 4 solo se ENTRAMBI i campi di Spesa 3 sono compilati
+            if (spesa3Select.value && spesa3Input.value && parseFloat(spesa3Input.value) > 0) {
                 spesa4Row.style.display = 'grid';
             } else {
                 spesa4Row.style.display = 'none';
@@ -708,7 +730,7 @@
             
             console.log('Data da salvare:', data, 'Giorno:', giorno);
             
-            // Validazione campo "Altro"
+            // Validazione campo "Altro" solo se la categoria è stata selezionata
             if (spesa1Select.value === 'Altro' && !spesa1Altro.value.trim()) {
                 alert('⚠️ Devi specificare il tipo di spesa per "Altro"');
                 spesa1Altro.focus();
@@ -821,10 +843,13 @@
                     importoSpesa4: parseFloat(formData.get('importoSpesa4')) || 0,
                     fornitore1: fornitore1Value,
                     importoFornitore1: parseFloat(formData.get('importoFornitore1')) || 0,
+                    bonifico1: formData.get('bonifico1') === 'on' ? 'SI' : 'NO',
                     fornitore2: fornitore2Value,
                     importoFornitore2: parseFloat(formData.get('importoFornitore2')) || 0,
+                    bonifico2: formData.get('bonifico2') === 'on' ? 'SI' : 'NO',
                     fornitore3: fornitore3Value,
                     importoFornitore3: parseFloat(formData.get('importoFornitore3')) || 0,
+                    bonifico3: formData.get('bonifico3') === 'on' ? 'SI' : 'NO',
                     pos: parseFloat(formData.get('pos')) || 0,
                     contanti: parseFloat(formData.get('contanti')) || 0,
                     corrispettivi: parseFloat(formData.get('corrispettivi')) || 0
@@ -872,4 +897,3 @@
     </script>
 </body>
 </html>
-
