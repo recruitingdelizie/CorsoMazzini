@@ -225,6 +225,50 @@
             animation: slideIn 0.3s;
         }
         
+        /* Overlay di caricamento */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-content p {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -531,6 +575,14 @@
         </div>
     </div>
     
+    <!-- Overlay di caricamento -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Salvataggio in corso...</p>
+        </div>
+    </div>
+    
     <script>
         // CONFIGURAZIONE - INSERISCI QUI I TUOI DATI
         const SPREADSHEET_ID = 'TUO_SPREADSHEET_ID'; // Sostituisci con l'ID del tuo Google Sheet
@@ -723,6 +775,9 @@
         document.getElementById('dataForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // MOSTRA OVERLAY
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
             // Ottieni la data selezionata e convertila in formato gg/mm/aaaa
             const dataSelezionata = new Date(datePicker.value + 'T00:00:00');
             const giornoFormattato = String(dataSelezionata.getDate()).padStart(2, '0');
@@ -735,24 +790,28 @@
             
             // Validazione campo "Altro" solo se la categoria è stata selezionata
             if (spesa1Select.value === 'Altro' && !spesa1Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il tipo di spesa per "Altro"');
                 spesa1Altro.focus();
                 return;
             }
             
             if (spesa2Select.value === 'Altro' && spesa2Row.style.display !== 'none' && !spesa2Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il tipo di spesa per "Altro"');
                 spesa2Altro.focus();
                 return;
             }
             
             if (spesa3Select.value === 'Altro' && spesa3Row.style.display !== 'none' && !spesa3Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il tipo di spesa per "Altro"');
                 spesa3Altro.focus();
                 return;
             }
             
             if (spesa4Select.value === 'Altro' && spesa4Row.style.display !== 'none' && !spesa4Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il tipo di spesa per "Altro"');
                 spesa4Altro.focus();
                 return;
@@ -760,18 +819,21 @@
             
             // Validazione Altro per fornitori (solo se il fornitore è stato selezionato)
             if (fornitore1Select.value === 'Altro' && !fornitore1Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il fornitore per "Altro"');
                 fornitore1Altro.focus();
                 return;
             }
             
             if (fornitore2Select.value === 'Altro' && fornitore2Row.style.display !== 'none' && !fornitore2Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il fornitore per "Altro"');
                 fornitore2Altro.focus();
                 return;
             }
             
             if (fornitore3Select.value === 'Altro' && fornitore3Row.style.display !== 'none' && !fornitore3Altro.value.trim()) {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert('⚠️ Devi specificare il fornitore per "Altro"');
                 fornitore3Altro.focus();
                 return;
@@ -788,28 +850,6 @@
             const fornitore1Value = formData.get('fornitore1') === 'Altro' ? formData.get('fornitore1Altro') : formData.get('fornitore1');
             const fornitore2Value = formData.get('fornitore2') === 'Altro' ? formData.get('fornitore2Altro') : formData.get('fornitore2');
             const fornitore3Value = formData.get('fornitore3') === 'Altro' ? formData.get('fornitore3Altro') : formData.get('fornitore3');
-            
-            const values = [
-                data,
-                giorno,
-                spesa1Value || '',
-                parseFloat(formData.get('importoSpesa1')) || 0,
-                spesa2Value || '',
-                parseFloat(formData.get('importoSpesa2')) || 0,
-                spesa3Value || '',
-                parseFloat(formData.get('importoSpesa3')) || 0,
-                spesa4Value || '',
-                parseFloat(formData.get('importoSpesa4')) || 0,
-                fornitore1Value || '',
-                parseFloat(formData.get('importoFornitore1')) || 0,
-                fornitore2Value || '',
-                parseFloat(formData.get('importoFornitore2')) || 0,
-                fornitore3Value || '',
-                parseFloat(formData.get('importoFornitore3')) || 0,
-                parseFloat(formData.get('pos')) || 0,
-                parseFloat(formData.get('contanti')) || 0,
-                parseFloat(formData.get('corrispettivi')) || 0
-            ];
             
             try {
                 // Invia i dati alla webapp di Google Apps Script usando iframe nascosto
@@ -870,27 +910,32 @@
                 form.submit();
                 document.body.removeChild(form);
                 
-                document.getElementById('successMessage').style.display = 'block';
+                // NASCONDI OVERLAY e mostra successo
                 setTimeout(() => {
-                    document.getElementById('successMessage').style.display = 'none';
-                    e.target.reset();
-                    // Resetta anche i campi nascosti
-                    spesa2Row.style.display = 'none';
-                    spesa3Row.style.display = 'none';
-                    spesa4Row.style.display = 'none';
-                    fornitore2Row.style.display = 'none';
-                    fornitore3Row.style.display = 'none';
-                    spesa1Altro.style.display = 'none';
-                    spesa2Altro.style.display = 'none';
-                    spesa3Altro.style.display = 'none';
-                    spesa4Altro.style.display = 'none';
-                    fornitore1Altro.style.display = 'none';
-                    fornitore2Altro.style.display = 'none';
-                    fornitore3Altro.style.display = 'none';
-                }, 2000);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                        e.target.reset();
+                        // Resetta anche i campi nascosti
+                        spesa2Row.style.display = 'none';
+                        spesa3Row.style.display = 'none';
+                        spesa4Row.style.display = 'none';
+                        fornitore2Row.style.display = 'none';
+                        fornitore3Row.style.display = 'none';
+                        spesa1Altro.style.display = 'none';
+                        spesa2Altro.style.display = 'none';
+                        spesa3Altro.style.display = 'none';
+                        spesa4Altro.style.display = 'none';
+                        fornitore1Altro.style.display = 'none';
+                        fornitore2Altro.style.display = 'none';
+                        fornitore3Altro.style.display = 'none';
+                    }, 2000);
+                }, 1500);
                 
             } catch (error) {
                 console.error('Errore:', error);
+                document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
                 setTimeout(() => {
                     document.getElementById('errorMessage').style.display = 'none';
@@ -900,4 +945,5 @@
     </script>
 </body>
 </html>
+
 
